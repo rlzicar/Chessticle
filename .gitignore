@@ -9,6 +9,7 @@
 
 # Whitelisted directories/files
 !/ProjectSettings/
+!/Packages/
 !/Assets/
 /Assets/*
 !/Assets/_Main/
