@@ -43,7 +43,7 @@ namespace Chessticle
             m_ChessboardUI.LocalPlayerMoved += OnLocalPlayerMoved;
             m_ChessboardUI.OpponentMoveFinished += OnMoveFinished;
             m_ChessboardUI.ResignationRequested += Resign;
-            m_ChessboardUI.NewOpponentRequested += StartNewGame;
+            m_ChessboardUI.NewOpponentRequested += FindNewOpponent;
             m_ChessboardUI.ClaimDrawRequested += ClaimDraw;
             m_ChessboardUI.OfferDrawRequested += OfferDraw;
             m_ChessboardUI.RefreshClaimDrawButton();
@@ -54,7 +54,7 @@ namespace Chessticle
             m_ChessboardUI.ResignationRequested -= Resign;
             m_ChessboardUI.LocalPlayerMoved -= OnLocalPlayerMoved;
             m_ChessboardUI.OpponentMoveFinished -= OnMoveFinished;
-            m_ChessboardUI.NewOpponentRequested -= StartNewGame;
+            m_ChessboardUI.NewOpponentRequested -= FindNewOpponent;
             m_ChessboardUI.ClaimDrawRequested -= ClaimDraw;
             m_ChessboardUI.OfferDrawRequested -= OfferDraw;
         }
@@ -90,7 +90,7 @@ namespace Chessticle
             }
         }
 
-        static void StartNewGame()
+        static void FindNewOpponent()
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().name);
         }
