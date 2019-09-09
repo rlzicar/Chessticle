@@ -1,3 +1,4 @@
+/*
 MIT License
 
 Copyright (c) 2019 Radek Lžičař
@@ -19,3 +20,22 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+*/
+
+namespace Chessticle
+{
+    public enum Piece : byte
+    {
+        None = 0,
+
+        WhitePawn = 1,
+        BlackPawn = 2,
+        Knight = 3,
+        King = 4,
+
+        // sliding pieces
+        Bishop = 5,
+        Rook = 6,
+        Queen = 7,
+    }
+}

@@ -1,3 +1,4 @@
+/*
 MIT License
 
 Copyright (c) 2019 Radek Lžičař
@@ -19,3 +20,30 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+*/
+
+using UnityEngine;
+using UnityEngine.EventSystems;
+
+namespace Chessticle
+{
+    public class PromotionPieceUI: MonoBehaviour, IPointerClickHandler
+    {
+        public Piece Piece;
+        
+        void Awake()
+        {
+            if (s_ChessboardUI == null)
+            {
+                s_ChessboardUI = GetComponentInParent<ChessboardUI>();
+            }
+        }
+
+        public void OnPointerClick(PointerEventData eventData)
+        {
+            s_ChessboardUI.OnPromotionPieceSelected(Piece);
+        }
+
+        static ChessboardUI s_ChessboardUI;
+    }
+}
