@@ -1,10 +1,10 @@
 # Chessticle
 
-A minimalistic multiplayer chess game made with Unity and Photon Unity Networking 2 (PUN 2).
-
-![](https://i.imgur.com/lI4onF4.png)
+A minimalist multiplayer chess game made with Unity and Photon Unity Networking 2 (PUN 2).
 
 Chessticle implements most of the chess rules, including castling, promotion and under-promotion, en passant captures, the threefold repetition rule and the fifty-move rule. The time control is 10+0.
+
+![](https://i.imgur.com/lI4onF4.png)
 
 ## Building
 - Open the project in Unity 2019.2.2f1
