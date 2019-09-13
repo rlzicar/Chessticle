@@ -34,7 +34,7 @@ namespace Chessticle
     {
         void Awake()
         {
-            Assert.AreEqual(1, FindObjectsOfType<GameManager>().Length);
+            Assert.AreEqual(1, FindObjectsOfType<RoomManager>().Length);
         }
 
         public void JoinOrCreateRoom(string preferredRoomName)
