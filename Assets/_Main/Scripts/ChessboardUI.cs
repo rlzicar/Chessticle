@@ -56,7 +56,6 @@ namespace Chessticle
         public Image[,] cube = new Image[8, 8];
         public Image[] cube1;
 
-
         public delegate void LocalPlayerMovedCallback(int startIdx, int targetIdx, Piece promotionPiece);
 
         public event Action OpponentMoveFinished;
