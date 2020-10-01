@@ -50,6 +50,11 @@ namespace Chessticle
         public GameObject LoadingIndicator;
         public Button OfferDrawButton;
         public Button AcceptDrawButton;
+        
+        public Image[,] panel = new Image[8, 8];
+        public Image[] panel1;
+        public Image[,] cube = new Image[8, 8];
+        public Image[] cube1;
 
 
         public delegate void LocalPlayerMovedCallback(int startIdx, int targetIdx, Piece promotionPiece);
@@ -86,6 +91,30 @@ namespace Chessticle
 
             SetDraggingEnabled(Color.White, false);
             SetDraggingEnabled(Color.Black, false);
+            
+            //For Getting Move For The Piece
+            int n = 0;
+            for(int i = 0; i < 8; i++)
+            {
+                for(int j = 0; j < 8; j++)
+                {
+                    panel[i, j] = panel1[n];
+                    panel[i, j].gameObject.SetActive(false);
+                    panel[i,j].GetComponent<RectTransform>().sizeDelta = m_SquareSize;
+                    n++;
+                }
+            }
+            n = 0;
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    cube[i, j] = cube1[n];
+                    cube[i, j].gameObject.SetActive(false);
+                    cube[i,j].GetComponent<RectTransform>().sizeDelta = m_SquareSize;
+                    n++;
+                }
+            }
         }
 
         (int rank, int file) PointerPositionToBoardCoords(Camera eventCamera, Vector2 eventPosition)
@@ -117,12 +146,55 @@ namespace Chessticle
         {
             (m_MoveStartRank, m_MoveStartFile)
                 = PointerPositionToBoardCoords(data.pressEventCamera, data.pressPosition);
+            var (piece, color) = chessboard.GetPiece(m_MoveStartRank, m_MoveStartFile);
+            if (color != Color.Black)
+            {
+                for (int i = 0; i < 8; i++)
+                {
+                    for (int j = 0; j < 8; j++)
+                    {
+                        var targetIdx = Chessboard.CoordsToIndex0X88(i, j);
+                        if (chessboard.IsLegalMove(startIdx, targetIdx, out var move))
+                        {
+                            int i1 = 7 - i;
+                            int j1 = 7 - j;
+                            panel[i, j].rectTransform.anchoredPosition = GetAnchoredPosition(i1, j);
+                            panel[i, j].gameObject.SetActive(true);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                for (int i = 7; i >= 0; i--)
+                {
+                    for (int j = 7; j >= 0; j--)
+                    {
+                        var targetIdx = Chessboard.CoordsToIndex0X88(i, j);
+                        if (chessboard.IsLegalMove(startIdx, targetIdx, out var move))
+                        {
+                            int j1 = 7 - j;
+                            panel[i, j].rectTransform.anchoredPosition = GetAnchoredPosition(i,j1);
+                            panel[i, j].gameObject.SetActive(true);
+                        }
+                    }
+                }
+            }
+                
         }
 
         public void OnEndMove(PointerEventData data)
         {
             var (endRank, endFile) = PointerPositionToBoardCoords(data.pressEventCamera, data.position);
             StartCoroutine(DoFinishLocalMove(m_MoveStartRank, m_MoveStartFile, endRank, endFile));
+            
+            for (int i = 0; i < 8; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    panel[i, j].gameObject.SetActive(false);
+                }
+            }
         }
 
 
