@@ -80,6 +80,11 @@ namespace Chessticle
                 yield return null;
             }
 
+            while (PhotonNetwork.NetworkClientState != ClientState.ConnectedToMasterServer)
+            {
+                yield return null;
+            }
+            
             if (!PhotonNetwork.InLobby && PhotonNetwork.NetworkClientState != ClientState.JoiningLobby)
             {
                 PhotonNetwork.JoinLobby();
