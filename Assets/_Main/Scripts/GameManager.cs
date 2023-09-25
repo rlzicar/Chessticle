@@ -320,7 +320,7 @@ namespace Chessticle
 
                         ShowMessage($"{msg} {secondsLeft} seconds to play the first move");
 
-                        if (secondsLeft <= 0)
+                        if (secondsLeft <= 0 || PhotonNetwork.CurrentRoom?.PlayerCount < 2)
                         {
                             m_State = State.Aborted;
                         }
