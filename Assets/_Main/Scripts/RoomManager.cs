@@ -41,11 +41,11 @@ namespace Chessticle
         {
             StopAllCoroutines();
             const float timeoutSeconds = 15f; 
-            StartCoroutine(DoCheckTimeout(timeoutSeconds));
-            StartCoroutine(DoJoinOrCreateRoom(preferredRoomName));
+            StartCoroutine(CheckTimeoutCoroutine(timeoutSeconds));
+            StartCoroutine(JoinOrCreateRoomCoroutine(preferredRoomName));
         }
 
-        IEnumerator DoCheckTimeout(float timeout)
+        IEnumerator CheckTimeoutCoroutine(float timeout)
         {
             DidTimeout = false;
             while (!PhotonNetwork.InRoom && timeout >= 0)
@@ -63,7 +63,7 @@ namespace Chessticle
 
         public bool DidTimeout { private set; get; }
 
-        static IEnumerator DoJoinOrCreateRoom(string preferredRoomName)
+        static IEnumerator JoinOrCreateRoomCoroutine(string preferredRoomName)
         {
             if (PhotonNetwork.InRoom)
             {
@@ -80,13 +80,13 @@ namespace Chessticle
                 yield return null;
             }
 
-            while (PhotonNetwork.NetworkClientState != ClientState.ConnectedToMasterServer)
-            {
-                yield return null;
-            }
-            
             if (!PhotonNetwork.InLobby && PhotonNetwork.NetworkClientState != ClientState.JoiningLobby)
             {
+                while (PhotonNetwork.NetworkClientState != ClientState.ConnectedToMasterServer)
+                {
+                    yield return null;
+                }
+
                 PhotonNetwork.JoinLobby();
             }
 

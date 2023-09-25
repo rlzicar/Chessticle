@@ -25,7 +25,7 @@ SOFTWARE.
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics.Tracing;
+using Unity.VectorGraphics;
 using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
@@ -91,12 +91,12 @@ namespace Chessticle
         (int rank, int file) PointerPositionToBoardCoords(Camera eventCamera, Vector2 eventPosition)
         {
             if (RectTransformUtility.ScreenPointToLocalPointInRectangle(BoardRect, eventPosition,
-                eventCamera, out var position))
+                    eventCamera, out var position))
             {
                 var boardSize = BoardRect.rect.size;
                 var pos01 = (position + boardSize / 2) / boardSize;
-                var rank = (int) Mathf.Floor(pos01.y * 8);
-                var file = (int) Mathf.Floor(pos01.x * 8);
+                var rank = (int)Mathf.Floor(pos01.y * 8);
+                var file = (int)Mathf.Floor(pos01.x * 8);
                 if (m_LocalPlayerColor == Color.White)
                 {
                     rank = 7 - rank;
@@ -122,7 +122,7 @@ namespace Chessticle
         public void OnEndMove(PointerEventData data)
         {
             var (endRank, endFile) = PointerPositionToBoardCoords(data.pressEventCamera, data.position);
-            StartCoroutine(DoFinishLocalMove(m_MoveStartRank, m_MoveStartFile, endRank, endFile));
+            StartCoroutine(FinishLocalMoveCoroutine(m_MoveStartRank, m_MoveStartFile, endRank, endFile));
         }
 
 
@@ -131,7 +131,7 @@ namespace Chessticle
             m_PromotionPiece = piece;
         }
 
-        IEnumerator DoFinishLocalMove(int startRank, int startFile, int targetRank, int targetFile)
+        IEnumerator FinishLocalMoveCoroutine(int startRank, int startFile, int targetRank, int targetFile)
         {
             var startIdx = Chessboard.CoordsToIndex0X88(startRank, startFile);
             var targetIdx = Chessboard.CoordsToIndex0X88(targetRank, targetFile);
@@ -215,10 +215,10 @@ namespace Chessticle
 
         public void StartOpponentMoveAnimation(int startIdx, int targetIdx, Piece promotionPiece)
         {
-            StartCoroutine(DoAnimateOpponentMove(startIdx, targetIdx, promotionPiece));
+            StartCoroutine(AnimateOpponentMoveCoroutine(startIdx, targetIdx, promotionPiece));
         }
 
-        IEnumerator DoAnimateOpponentMove(int startIdx, int targetIdx, Piece promotionPiece)
+        IEnumerator AnimateOpponentMoveCoroutine(int startIdx, int targetIdx, Piece promotionPiece)
         {
             var (piece, color) = Chessboard.GetPiece(startIdx);
             bool virgin = Chessboard.IsVirgin(startIdx);

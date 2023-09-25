@@ -58,7 +58,7 @@ namespace Chessticle
 
         public void SetPiece(int idx, Piece piece, Color color, bool virgin)
         {
-            m_Board[idx] = (byte) (PieceToBoardValue(piece, color) | (virgin ? k_VirginMask : 0));
+            m_Board[idx] = (byte)(PieceToBoardValue(piece, color) | (virgin ? k_VirginMask : 0));
         }
 
         public (int rank, int file) GetCheckCoords()
@@ -83,8 +83,7 @@ namespace Chessticle
         {
             var (piece, _) = GetPiece(startIdx);
 
-            bool isOnPromotionRank = (targetIdx >= 0 && targetIdx <= 0x07)
-                                     || (targetIdx >= 0x70 && targetIdx <= 0x77);
+            bool isOnPromotionRank = targetIdx is (>= 0 and <= 0x07) or (>= 0x70 and <= 0x77);
 
             bool isPromotion = IsPawn(piece) && isOnPromotionRank;
 
@@ -141,10 +140,7 @@ namespace Chessticle
             m_LastMove = move;
             CurrentPlayer = CurrentPlayer == Color.White ? Color.Black : Color.White;
             var currentPositionHash = ZobristHashing.HashPosition(m_Board, CurrentPlayer);
-            if (!m_PositionCountsByHash.ContainsKey(currentPositionHash))
-            {
-                m_PositionCountsByHash[currentPositionHash] = 0;
-            }
+            m_PositionCountsByHash.TryAdd(currentPositionHash, 0);
 
             m_PositionCountsByHash[currentPositionHash] += 1;
 
@@ -160,7 +156,7 @@ namespace Chessticle
         {
             if (m_LastMove.IsEmpty) return;
 
-            // this currently doesn't undo the enpassant target etc., but it doesn't matter because this 
+            // this currently doesn't undo the en-passant target etc., but it doesn't matter because this 
             // method is only called in order to revert the move the local player tried to make
             // right before running out of time
             UnmakeMove(m_LastMove);
@@ -203,7 +199,7 @@ namespace Chessticle
                 }
             }
 
-            return IsAttacked(kingIdx);
+            return IsAttacked(kingIdx, kingColor);
         }
 
         static bool IsOffBoardIndex(int idx)
@@ -211,16 +207,8 @@ namespace Chessticle
             return (idx & 0x88) != 0;
         }
 
-        bool IsAttacked(int squareIdx, Color? attackeeColor = null)
+        bool IsAttacked(int squareIdx, Color attackedColor)
         {
-            var value = m_Board[squareIdx];
-            if (value == k_EmptySquare && !attackeeColor.HasValue)
-            {
-                return false;
-            }
-
-            var color = attackeeColor ?? BoardValueToColor(value);
-
             var knightOffsets = s_MovementOffsetsByPiece[Piece.Knight];
 
             // check if the square is attacked by a knight
@@ -233,7 +221,7 @@ namespace Chessticle
                 }
 
                 var (attackingPiece, attackingColor) = GetPiece(attackerIdx);
-                bool isAttackedByKnight = attackingPiece == Piece.Knight && attackingColor != color;
+                bool isAttackedByKnight = attackingPiece == Piece.Knight && attackingColor != attackedColor;
 
                 if (isAttackedByKnight)
                 {
@@ -255,20 +243,20 @@ namespace Chessticle
                         break;
                     }
 
-                    var (attackingPiece, attackerColor) = GetPiece(attackerIdx);
+                    var (attackingPiece, attackingColor) = GetPiece(attackerIdx);
                     if (attackingPiece == Piece.None)
                     {
                         continue;
                     }
 
-                    if (attackerColor == color)
+                    if (attackingColor == attackedColor)
                     {
                         // can't be attacked by my own piece
                         break;
                     }
 
                     bool isOneSquareAway = n == 0;
-                    bool diagonal = offset == -15 || offset == 15 || offset == -17 || offset == 17;
+                    bool diagonal = offset is -15 or 15 or -17 or 17;
                     bool isAttackedByBlackPawn = attackingPiece == Piece.BlackPawn
                                                  && isOneSquareAway && diagonal && offset < 0;
                     bool isAttackedByWhitePawn = attackingPiece == Piece.WhitePawn
@@ -287,7 +275,6 @@ namespace Chessticle
                     }
 
                     // stop on the first non-empty square
-                    Assert.IsTrue(attackingPiece != Piece.None);
                     break;
                 }
             }
@@ -334,7 +321,7 @@ namespace Chessticle
 
         static Piece BoardValueToPiece(byte squareValue)
         {
-            return (Piece) (squareValue & 7);
+            return (Piece)(squareValue & 7);
         }
 
         static Color BoardValueToColor(byte squareValue)
@@ -349,7 +336,7 @@ namespace Chessticle
 
         static byte PieceToBoardValue(Piece piece, Color color)
         {
-            return (byte) ((byte) piece | (byte) color);
+            return (byte)((byte)piece | (byte)color);
         }
 
 
@@ -363,7 +350,7 @@ namespace Chessticle
             bool isPawnPromotion = promotionPiece != Piece.None;
             if (!isPawnPromotion)
             {
-                m_Board[move.TargetIdx] = (byte) (move.StartValue & ~k_VirginMask);
+                m_Board[move.TargetIdx] = (byte)(move.StartValue & ~k_VirginMask);
             }
             else
             {
@@ -401,7 +388,7 @@ namespace Chessticle
             {
                 bool isKingSideCastling = offset == 2;
                 var rookIdx = isKingSideCastling ? move.StartIdx + 3 : move.StartIdx - 4;
-                m_Board[rookIdx] = (byte) (PieceToBoardValue(Piece.Rook, color) | k_VirginMask);
+                m_Board[rookIdx] = (byte)(PieceToBoardValue(Piece.Rook, color) | k_VirginMask);
                 int rookIdxAfterCastling = move.TargetIdx + (isKingSideCastling ? -1 : +1);
                 m_Board[rookIdxAfterCastling] = k_EmptySquare;
             }
@@ -561,13 +548,13 @@ namespace Chessticle
 
             var targetIdx = startIdx + offset;
             var targetSquare = board[targetIdx];
-            
+
             bool startingOnInitialRank = color == Color.Black
-                ? startIdx >= 0x10 && startIdx <= 0x17
-                : startIdx >= 0x60 && startIdx <= 0x67;
+                ? startIdx is >= 0x10 and <= 0x17
+                : startIdx is >= 0x60 and <= 0x67;
             bool isDoubleMove = Mathf.Abs(offset) == 32;
             int skippedIdx = (startIdx + (offset / 2));
-            
+
             if (isDoubleMove)
             {
                 nextEnPassantTargetIdx = targetIdx;
@@ -575,14 +562,14 @@ namespace Chessticle
 
             bool diagonal = (offset & 1) != 0;
             bool isTargetEmpty = targetSquare == k_EmptySquare;
-            bool isOponentOnTargetSquare = !isTargetEmpty && BoardValueToColor(board[targetIdx]) != color;
+            bool isOpponentOnTargetSquare = !isTargetEmpty && BoardValueToColor(board[targetIdx]) != color;
             var skippedSquare = board[skippedIdx];
             var enPassantTargetPiece = BoardValueToPiece(board[currentEnPassantTargetIdx]);
             var squareNextToCapturingPawnIdx = targetIdx - (offset > 0 ? 16 : -16);
             var isValidEnPassantCapture =
                 diagonal && (squareNextToCapturingPawnIdx == currentEnPassantTargetIdx)
                          && IsPawn(enPassantTargetPiece);
-            var isValidCapture = (diagonal && isOponentOnTargetSquare) || isValidEnPassantCapture;
+            var isValidCapture = (diagonal && isOpponentOnTargetSquare) || isValidEnPassantCapture;
             bool isValidPawnMove =
                 (!isDoubleMove && !diagonal && isTargetEmpty) ||
                 (isDoubleMove && startingOnInitialRank && isTargetEmpty && skippedSquare == k_EmptySquare)
@@ -598,7 +585,7 @@ namespace Chessticle
         void SetRankPieces(int rank, string rankPieces)
         {
             Assert.AreEqual(8, rankPieces.Length);
-            Assert.IsTrue(rank >= 0 && rank < 8);
+            Assert.IsTrue(rank is >= 0 and < 8);
             for (int file = 0; file < 8; file++)
             {
                 var pieceChar = rankPieces[file];
@@ -607,7 +594,7 @@ namespace Chessticle
                 var color = char.IsUpper(pieceChar) ? Color.White : Color.Black;
                 var piece = CharToPiece(pieceChar, color);
                 var idx = 16 * rank + file;
-                m_Board[idx] = (byte) piece;
+                m_Board[idx] = (byte)piece;
                 m_Board[idx] |= isWhite ? White : Black;
                 bool isCastlingPiece = piece == Piece.King || piece == Piece.Rook;
                 if (isCastlingPiece)
@@ -643,29 +630,29 @@ namespace Chessticle
         static readonly Dictionary<Piece, int[]> s_MovementOffsetsByPiece = new Dictionary<Piece, int[]>
         {
             {
-                Piece.WhitePawn, new[] {-16, -32, -15, -17}
+                Piece.WhitePawn, new[] { -16, -32, -15, -17 }
             },
             {
-                Piece.BlackPawn, new[] {16, 32, 15, 17}
+                Piece.BlackPawn, new[] { 16, 32, 15, 17 }
             },
             {
-                Piece.King, new[] {-1, 1, -2, 2, -15, 15, -16, -17, 16, 17}
+                Piece.King, new[] { -1, 1, -2, 2, -15, 15, -16, -17, 16, 17 }
             },
             {
-                Piece.Queen, new[] {-1, 1, -15, 15, -16, -17, 16, 17}
+                Piece.Queen, new[] { -1, 1, -15, 15, -16, -17, 16, 17 }
             },
             {
-                Piece.Bishop, new[] {-15, 15, -17, 17}
+                Piece.Bishop, new[] { -15, 15, -17, 17 }
             },
             {
-                Piece.Rook, new[] {-1, 1, -16, 16}
+                Piece.Rook, new[] { -1, 1, -16, 16 }
             },
             {
-                Piece.Knight, new[] {-16 + 2, -16 - 2, 16 + 2, 16 - 2, -32 + 1, -32 - 1, 32 + 1, 32 - 1}
+                Piece.Knight, new[] { -16 + 2, -16 - 2, 16 + 2, 16 - 2, -32 + 1, -32 - 1, 32 + 1, 32 - 1 }
             }
         };
 
-        public static int MaxBoardValue => (byte) Piece.Queen | Black | k_VirginMask;
+        public static int MaxBoardValue => (byte)Piece.Queen | Black | k_VirginMask;
         const byte k_EmptySquare = 0;
         int m_HalfMoveCountSincePawnMoveOrCapture;
         readonly Dictionary<ulong, int> m_PositionCountsByHash = new Dictionary<ulong, int>();

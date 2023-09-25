@@ -430,6 +430,7 @@ namespace Chessticle
 
                 yield return wait;
             }
+            // ReSharper disable once IteratorNeverReturns
         }
 
         void ShowMessage(string text)
@@ -462,7 +463,7 @@ namespace Chessticle
         bool m_DrawClaimed;
 
         const int k_StartClockTime = 10 * 60;
-        readonly Clock m_Clock = new Clock(k_StartClockTime);
+        readonly Clock m_Clock = new(k_StartClockTime);
         bool m_GameStarted;
         bool m_AtLeastOneMoveWasMade;
         double m_StartTime;

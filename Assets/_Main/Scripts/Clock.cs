@@ -77,11 +77,11 @@ namespace Chessticle
             float delta = 0;
             if (m_Running && m_CurrentPlayer == color)
             {
-                delta = (float) (serverTime - m_LastSwitchServerTime);
+                delta = (float)(serverTime - m_LastSwitchServerTime);
             }
 
             var time = color == Color.White ? m_WhiteTime : m_BlackTime;
-            var value = Mathf.Max(0, (float) (time - delta));
+            var value = Mathf.Max(0, (float)(time - delta));
             return value;
         }
 

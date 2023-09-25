@@ -7,7 +7,7 @@ Chessticle implements most of the chess rules, including castling, promotion and
 ![](https://i.imgur.com/lI4onF4.png)
 
 ## Building
-- Open the project in Unity 2019.2.2f1
+- Open the project in Unity 2022.3.8f1
 - Import PUN 2 from the Asset Store into the project ([https://assetstore.unity.com/packages/tools/network/pun-2-free-119922](https://assetstore.unity.com/packages/tools/network/pun-2-free-119922))
 - Configure your App Id in *PhotonServerSettings.asset* ([How to Obtain Your App ID](https://doc.photonengine.com/en-us/realtime/current/getting-started/obtain-your-app-id))
 - Build the game
