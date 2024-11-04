@@ -139,7 +139,7 @@ namespace Chessticle
         [PunRPC]
         void RpcMove(byte startIdx, byte targetIdx, Piece promotionPiece, PhotonMessageInfo info)
         {
-            bool isMyMove = info.Sender.UserId == PhotonNetwork.LocalPlayer.UserId;
+            bool isMyMove = info.Sender.ActorNumber == PhotonNetwork.LocalPlayer.ActorNumber;
             var currentPlayer = isMyMove ? m_LocalPlayerColor : m_OpponentColor;
             var nextPlayer = OpponentColor(currentPlayer);
 
